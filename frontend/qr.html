@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>计件通 · 手机入口二维码</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px 40px; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #f4f6f9; color: #10233c; }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    h1 { font-size: 24px; margin: 0 0 6px; }
+    .sub { color: #718096; font-size: 13px; margin-bottom: 18px; }
+    .bar { background: #fff; border-radius: 14px; padding: 14px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; box-shadow: 0 6px 20px rgba(16,35,60,.06); }
+    .bar label { font-size: 13px; font-weight: 600; }
+    .bar input { flex: 1; min-width: 180px; border: 1px solid #dce5ef; border-radius: 9px; padding: 10px 12px; font-size: 14px; }
+    .bar button { border: 0; background: #1467e8; color: #fff; border-radius: 9px; padding: 10px 18px; font-weight: 700; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .card { background: #fff; border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 6px 20px rgba(16,35,60,.06); }
+    .card h2 { font-size: 15px; margin: 0 0 10px; color: #1467e8; }
+    .qr { min-height: 220px; display: flex; align-items: center; justify-content: center; }
+    .qr img { width: 220px; height: 220px; image-rendering: pixelated; }
+    .url { font-size: 11px; color: #526173; word-break: break-all; margin-top: 8px; background: #f7f9fc; padding: 7px 8px; border-radius: 7px; }
+    .note { color: #718096; font-size: 12px; line-height: 1.8; margin-top: 16px; }
+    .print { margin-top: 14px; border: 1px solid #1467e8; color: #1467e8; background: #fff; border-radius: 9px; padding: 10px 18px; font-weight: 700; cursor: pointer; }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .bar, .print, .note { display: none; }
+      .card { box-shadow: none; border: 1px solid #ddd; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>手机入口二维码</h1>
+    <div class="sub">换电脑或换 IP 后，用这个页面重新生成，旧二维码作废。</div>
+
+    <div class="bar">
+      <label for="ip">服务器局域网 IP</label>
+      <input id="ip" placeholder="例如 192.168.1.23" autocomplete="off" />
+      <button type="button" onclick="renderQr()">生成</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>1. 安装证书</h2>
+        <div class="qr" id="certQr"></div>
+        <div class="url" id="certUrl"></div>
+      </div>
+      <div class="card">
+        <h2>2. 扫码报工</h2>
+        <div class="qr" id="appQr"></div>
+        <div class="url" id="appUrl"></div>
+      </div>
+    </div>
+
+    <button class="print" type="button" onclick="window.print()">打印这张二维码</button>
+    <div class="note">
+      先让员工扫左边安装证书，再扫右边进入报工。<br />
+      手机必须和服务器连同一个 Wi-Fi；证书每台手机安装一次。<br />
+      如果服务器 IP 变了，需要重新生成证书，并重新生成这张二维码。
+    </div>
+  </div>
+
+  <script src="./vendor/qrcode.js"></script>
+  <script>
+    const ipInput = document.getElementById('ip');
+    const localHost = location.hostname;
+    if (localHost && localHost !== '127.0.0.1' && localHost !== 'localhost') {
+      ipInput.value = localHost;
+    }
+
+    function makeQr(targetId, url) {
+      const box = document.getElementById(targetId);
+      box.innerHTML = '';
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+        box.innerHTML = qr.createImgTag(7, 8);
+      } catch (err) {
+        box.textContent = '二维码生成失败：' + err.message;
+      }
+    }
+
+    function renderQr() {
+      const ip = ipInput.value.trim();
+      if (!ip) {
+        alert('请先填写服务器局域网 IP');
+        return;
+      }
+      const cert = 'http://' + ip + ':8788/';
+      const app = 'https://' + ip + ':8443/';
+      document.getElementById('certUrl').textContent = cert;
+      document.getElementById('appUrl').textContent = app;
+      makeQr('certQr', cert);
+      makeQr('appQr', app);
+    }
+
+    if (ipInput.value) {
+      renderQr();
+    } else {
+      document.getElementById('certUrl').textContent = '请先填写服务器 IP';
+      document.getElementById('appUrl').textContent = '请先填写服务器 IP';
+    }
+  </script>
+</body>
+</html>

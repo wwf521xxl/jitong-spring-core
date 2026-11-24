@@ -1,0 +1,15 @@
+# 示例：生产环境使用 PostgreSQL
+# 启动时加 --spring.profiles.active=postgres
+spring:
+  datasource:
+    url: ${JITONG_DB_URL:jdbc:postgresql://localhost:5432/jitong}
+    username: ${JITONG_DB_USER:jitong}
+    password: ${JITONG_DB_PASSWORD:jitong}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      # Flyway 是 schema 的唯一来源；PostgreSQL 下不做 Hibernate 反向校验，避免方言差异误报。
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

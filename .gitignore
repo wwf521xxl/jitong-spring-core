@@ -1,0 +1,45 @@
+# Java / Maven
+springboot-core/target/
+springboot-core/.flattened-pom.xml
+*.class
+*.jar
+!springboot-core/.mvn/wrapper/maven-wrapper.jar
+
+# Local toolchains / caches
+.tools/
+.m2repo/
+.mvn/
+!springboot-core/.mvn/
+!springboot-core/.mvn/wrapper/
+!springboot-core/.mvn/wrapper/maven-wrapper.properties
+
+# Runtime data (never commit)
+data/
+springboot-core/data/
+backups/
+certs/
+*.db
+*.db-wal
+*.db-shm
+*.log
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+deploy/.env
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+_smoke*.py
+_inspect.py
+_download_maven.py
+_Pbkdf2*.java
+_CheckPin*.java
+_demo.db
